@@ -1,7 +1,10 @@
 use_frameworks!
+
+pod 'SwiftyJSON', '~> 3.0'
+
 target 'SwiftDecodePipeline_Tests' do
   pod 'SwiftDecodePipeline', :path => '../'
   
-  pod 'Quick', '~> 0.8'
-  pod 'Nimble', '~> 3.0'
+  pod 'Quick', '~> 1.0'
+  pod 'Nimble', '~> 5.0'
 end
