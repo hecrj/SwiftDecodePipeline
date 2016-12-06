@@ -207,8 +207,6 @@ let json: JSON!
 let result = decodeUser(json)
 ```
 
-## Requirements
-
 ## Installation
 
 SwiftDecodePipeline is available through [CocoaPods](http://cocoapods.org). To install
