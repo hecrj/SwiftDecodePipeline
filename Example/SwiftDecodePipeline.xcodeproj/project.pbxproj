@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		607FACEC1AFB9204008FA782 /* Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACEB1AFB9204008FA782 /* Tests.swift */; };
 		7B0FA341E07164DE2247301B /* Pods_SwiftDecodePipeline_Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7D4588B9AF273B8439C3AA1F /* Pods_SwiftDecodePipeline_Tests.framework */; };
+		C4D1BBC91DF65E250061F3D9 /* users.json in Resources */ = {isa = PBXBuildFile; fileRef = C4D1BBC81DF65E250061F3D9 /* users.json */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -19,6 +20,7 @@
 		7D4588B9AF273B8439C3AA1F /* Pods_SwiftDecodePipeline_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_SwiftDecodePipeline_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A9501DD87867E2A7435FA59F /* SwiftDecodePipeline.podspec */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = SwiftDecodePipeline.podspec; path = ../SwiftDecodePipeline.podspec; sourceTree = "<group>"; };
 		B58326BE200258B515718553 /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
+		C4D1BBC81DF65E250061F3D9 /* users.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = users.json; sourceTree = "<group>"; };
 		F5D2DE5AFAF4C6CF0937371C /* Pods-SwiftDecodePipeline_Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SwiftDecodePipeline_Tests.release.xcconfig"; path = "Pods/Target Support Files/Pods-SwiftDecodePipeline_Tests/Pods-SwiftDecodePipeline_Tests.release.xcconfig"; sourceTree = "<group>"; };
 		FDC120E463C619BF0EADEF4C /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -83,6 +85,7 @@
 		607FACE91AFB9204008FA782 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				C4D1BBC81DF65E250061F3D9 /* users.json */,
 				607FACEA1AFB9204008FA782 /* Info.plist */,
 			);
 			name = "Supporting Files";
@@ -161,6 +164,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C4D1BBC91DF65E250061F3D9 /* users.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

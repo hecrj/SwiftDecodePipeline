@@ -22,10 +22,10 @@ understand and reason about.
 
 My take is that decoders should be pure functions that live independently from types. They accept some data (JSON, for now) and produce either an error
 or an instance of some type. Decoders should be easy to compose and reuse, and all it should be needed for that is one simple infix operator:
-the pipeline `(|>)`. This approach is really well implemented in [elm-decode-pipeline][edp], an Elm library, producing simple, readable and
+the pipeline `(|>)`. This approach is really well implemented in [elm-decode-pipeline][edp], an [Elm][elmlang] library, producing simple, readable and
 reusable decoders.
 
-`SwiftDecodePipeline` tries to bring the spirit of [elm-decode-pipeline][edp] into Swift.
+**SwiftDecodePipeline** tries to bring the spirit of [elm-decode-pipeline][edp] into Swift.
 
 ## Example
 
@@ -67,17 +67,17 @@ let decodeUser: Decoder<User> =
         |> optional("image", string)
         |> required("score", int)
         |> required("sports", array(string))
-        |> hardcode("athlete")
+        |> hardcoded("athlete")
 ```
 
 Now we can decode the response:
 
 ```swift
-let json: String
+let data: String!
 
 // We make a request to /users and obtain the JSON here...
 
-let result = decode(json, with: array(decodeUser))
+let result = decodeJSON(data, with: array(decodeUser))
 
 switch result {
 case .error(let error): print("Invalid format: \(error)") // error describes the decoding error
@@ -85,17 +85,21 @@ case .ok(let users): doSomething(with: users) // users has type [User] :D
 }
 ````
 
-In the example above, `json` is a `String`. However, the `decode` function supports different types for the first parameter to suit your needs.
+In the example above, `data` is a `String`. However, the `decode` function supports different types for the first parameter to suit your needs.
 The next section describes the different data types that can be decoded using this library.
 
-Notice how easy is to transform and reuse decoders. In this case, our `decodeUser` is able to decode a single user, but we want to decode a list of users.
+Notice how easy it is to transform and reuse decoders. In this case, our `decodeUser` is able to decode a single user, but we want to decode a list of users.
 Thus, we end up using `array(decodeUser)` to transform our `Decoder<User>` into a `Decoder<[User]>`. A `Decoder<Type>` returns either `.error(String)`
-when the format is invalid or doesn't meet the decoder restrictions, or `.ok(Type)` when the input was decoded sucessfully.
+when the format is invalid, or `.ok(Type)` when the input was decoded sucessfully.
 
 
 ## Available functions
-### Decode
-The ...
+### `decodeJSON(json, with: decoder)`
+
+It allows to use decoders for JSON decoding in a convenient way. Right now, there are 3 different `decodeJSON` definitions. Each one of them accepts
+JSON in a different form: `Data`, `String` and `Any`.
+
+The `Any` definition is there to [support Alamofire response data](#library-support).
 
 ### Primitives
 
@@ -117,8 +121,8 @@ In this section, the syntax `<modifier>(<configParams>)` is used to describe the
 
 #### `required(String, Decoder<A>)` and `optional(String, Decoder<A>)`
 
-`required` extracts a field from a JSON object and decodes its value into an `A`.
-`optional` does the same, but if the field does not exist it returns `nil`, thus decoding into an `A?`.
+`required` extracts a field from a JSON object and decodes its value into an `A`, failing if the field does not exist or it is `null`.
+`optional` does the same while allowing the field to be missing or `null`, thus decoding into an `A?`.
 
 ```swift
 struct User {
@@ -144,13 +148,15 @@ struct Post {
 
 let decodePost: Decoder<Post> =
     decode(Post.init)
-        /...
-        |> required("authors", decodeUser |> array) // You could use array(decodeUser), they are equivalent
+        //...
+        |> required("authors", decodeUser |> array)
+        // We could use array(decodeUser), they are equivalent
+        // ...
 ```
 
-#### `hardcode(A)`
+#### `hardcoded(A)`
 
-It always returns the provided value, independently of the JSON. It is useful to hardcode data in the decoding pipline.
+It always returns the provided value, independently of the JSON data. It is useful to hardcode data in the decoding pipeline.
 
 ```swift
 let decodeMockedUser: Decoder<User> =
@@ -169,7 +175,6 @@ It transforms a decoded value from `A` to `B`.
 let decodeLowercasedString: Decoder<String> = string |> map { $0.lowercased }
 ```
 
-
 ## Library support
 
 ### Alamofire
@@ -179,9 +184,9 @@ This library can be used with [Alamofire][alamofire] easily:
 ```swift
 Alamofire.request("https://example.com/users").validate().responseJSON { response in
     switch response.result {
-    case .success(let json):
+    case .success(let data):
         // We want to decode a list of users, so we use array
-        let decodingResult = decode(json, array(decodeUser))
+        let decodingResult = decodeJSON(data, with: array(decodeUser))
 
         switch decodingResult {
         case .error(let error): print("Invalid format: \(error)") // error describes the decoding error
@@ -194,8 +199,13 @@ Alamofire.request("https://example.com/users").validate().responseJSON { respons
 
 ### SwiftyJSON
 
-This library uses [SwiftyJSON](swiftyjson) internally. You should be able to decode `JSON` types with the `decode` function
-with no issues.
+This library uses [SwiftyJSON](swiftyjson) internally. You should be able to decode `JSON` types using decoders
+directly:
+
+```swift
+let json: JSON!
+let result = decodeUser(json)
+```
 
 ## Requirements
 
@@ -216,8 +226,22 @@ Héctor Ramón Jiménez
 
 SwiftDecodePipeline is available under the MIT license. See the LICENSE file for more info.
 
+## Contributing
+
+1. Fork the repository.
+2. Make your changes, tests will be appreciated.
+3. Open a Pull Request in this repository.
+
+## Special mentions (and thanks)
+* [SwiftyJSON][swiftyjson], as it is really easy to use and this library uses it internally.
+* [Curry][curry], another cool library that is used behind the scenes.
+* [Argo][argo]
+* [Elm][elmlang]
+
 
 [argo]: https://github.com/thoughtbot/Argo
 [edp]: https://github.com/NoRedInk/elm-decode-pipeline
 [alamofire]: https://github.com/Alamofire/Alamofire
-[swiftyjson]: https://gi
+[swiftyjson]: https://github.com/SwiftyJSON/SwiftyJSON
+[curry]: https://github.com/thoughtbot/Curry
+[elmlang]: http://elm-lang.org

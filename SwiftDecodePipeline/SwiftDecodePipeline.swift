@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import Curry
 import SwiftyJSON
 
 // Pipe operator
@@ -29,9 +30,54 @@ public enum Result<E, V> {
 
 public typealias Decoder<T> = (JSON) -> Result<String, T>
 
+// Decoding functions
+public func decodeJSON<T>(_ json: String, with decoder: Decoder<T>) -> Result<String, T> {
+    if let jsonFromString = json.data(using: .utf8, allowLossyConversion: false) {
+        return decodeJSON(jsonFromString, with: decoder)
+    } else {
+        return .error("String could not be converted to JSON data")
+    }
+}
+
+public func decodeJSON<T>(_ json: Data, with decoder: Decoder<T>) -> Result<String, T> {
+    return decoder(JSON(data: json))
+}
+
+public func decodeJSON<T>(_ json: Any, with decoder: Decoder<T>) -> Result<String, T> {
+    return decoder(JSON(json))
+}
+
 // Composable functions
 public func decode<A>(_ value: A) -> Decoder<A> {
     return { json in return .ok(value) }
+}
+
+public func decode<A, B>(_ function: @escaping (A) -> B) -> Decoder<(A) -> B> {
+    return { json in return .ok(curry(function)) }
+}
+
+public func decode<A, B, C>(_ function: @escaping (A, B) -> C) -> Decoder<(A) -> (B) -> C> {
+    return { json in return .ok(curry(function)) }
+}
+
+public func decode<A, B, C, D>(_ function: @escaping (A, B, C) -> D) -> Decoder<(A) -> (B) -> (C) -> D> {
+    return { json in return .ok(curry(function)) }
+}
+
+public func decode<A, B, C, D, E>(_ function: @escaping (A, B, C, D) -> E) -> Decoder<(A) -> (B) -> (C) -> (D) -> E> {
+    return { json in return .ok(curry(function)) }
+}
+
+public func decode<A, B, C, D, E, F>(_ function: @escaping (A, B, C, D, E) -> F) -> Decoder<(A) -> (B) -> (C) -> (D) -> (E) -> F> {
+    return { json in return .ok(curry(function)) }
+}
+
+public func decode<A, B, C, D, E, F, G>(_ function: @escaping (A, B, C, D, E, F) -> G) -> Decoder<(A) -> (B) -> (C) -> (D) -> (E) -> (F) -> G> {
+    return { json in return .ok(curry(function)) }
+}
+
+public func decode<A, B, C, D, E, F, G, H>(_ function: @escaping (A, B, C, D, E, F, G) -> H) -> Decoder<(A) -> (B) -> (C) -> (D) -> (E) -> (F) -> (G) -> H> {
+    return { json in return .ok(curry(function)) }
 }
 
 public func required<A>(_ decoder: @escaping Decoder<A?>) -> Decoder<A> {
@@ -69,7 +115,7 @@ public func optional<A, B>(_ key: String, _ valDecoder: @escaping Decoder<A>)
         }
 }
 
-public func hardcode<A, B>(_ value: A)
+public func hardcoded<A, B>(_ value: A)
     -> (_ decoder: @escaping Decoder<(A) -> B>) -> Decoder<B> {
         return custom(decode(value))
 }

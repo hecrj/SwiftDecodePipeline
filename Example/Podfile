@@ -1,6 +1,7 @@
 use_frameworks!
 
 pod 'SwiftyJSON', '~> 3.0'
+pod 'Curry', '~> 3.0'
 
 target 'SwiftDecodePipeline_Tests' do
   pod 'SwiftDecodePipeline', :path => '../'

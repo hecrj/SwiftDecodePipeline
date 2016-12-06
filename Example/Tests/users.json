@@ -1,0 +1,4 @@
+[
+ { "id": 1, "name": "John", "last_name": "Doe", "image": null, "sports": ["basketball", "tennis"], "score": 3 },
+ { "id": 2, "name": "Alan", "last_name": "Turing", "image": "https://placehold.it/100x100", "sports": ["running"], "score": 5 }
+]
