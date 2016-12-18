@@ -80,6 +80,26 @@ public func decode<A, B, C, D, E, F, G, H>(_ function: @escaping (A, B, C, D, E,
     return { json in return .ok(curry(function)) }
 }
 
+public func decode<A, B, C, D, E, F, G, H, I>(_ function: @escaping (A, B, C, D, E, F, G, H) -> I) -> Decoder<(A) -> (B) -> (C) -> (D) -> (E) -> (F) -> (G) -> (H) -> I> {
+    return { json in return .ok(curry(function)) }
+}
+
+public func decode<A, B, C, D, E, F, G, H, I, J>(_ function: @escaping (A, B, C, D, E, F, G, H, I) -> J) -> Decoder<(A) -> (B) -> (C) -> (D) -> (E) -> (F) -> (G) -> (H) -> (I) -> J> {
+    return { json in return .ok(curry(function)) }
+}
+
+public func decode<A, B, C, D, E, F, G, H, I, J, K>(_ function: @escaping (A, B, C, D, E, F, G, H, I, J) -> K) -> Decoder<(A) -> (B) -> (C) -> (D) -> (E) -> (F) -> (G) -> (H) -> (I) -> (J) -> K> {
+    return { json in return .ok(curry(function)) }
+}
+
+public func decode<A, B, C, D, E, F, G, H, I, J, K, L>(_ function: @escaping (A, B, C, D, E, F, G, H, I, J, K) -> L) -> Decoder<(A) -> (B) -> (C) -> (D) -> (E) -> (F) -> (G) -> (H) -> (I) -> (J) -> (K) -> L> {
+    return { json in return .ok(curry(function)) }
+}
+
+public func decode<A, B, C, D, E, F, G, H, I, J, K, L, M>(_ function: @escaping (A, B, C, D, E, F, G, H, I, J, K, L) -> M) -> Decoder<(A) -> (B) -> (C) -> (D) -> (E) -> (F) -> (G) -> (H) -> (I) -> (J) -> (K) -> (L) -> M> {
+    return { json in return .ok(curry(function)) }
+}
+
 public func required<A>(_ decoder: @escaping Decoder<A?>) -> Decoder<A> {
     return { json in
         let result = decoder(json)
@@ -97,22 +117,41 @@ public func required<A>(_ decoder: @escaping Decoder<A?>) -> Decoder<A> {
 }
 
 public func required<A, B>(_ key: String, _ valDecoder: @escaping Decoder<A>)
-    -> (_ decoder: @escaping Decoder<(A) -> B>) -> Decoder<B> {
+    -> (@escaping Decoder<(A) -> B>) -> Decoder<B> {
         return custom(field(key, valDecoder))
 }
 
+public func at<A, B>(_ keys: [String], _ valDecoder: @escaping Decoder<A>) -> (@escaping Decoder<(A) -> B>) -> Decoder<B> {
+    return custom { json in
+        var nested = json
+        
+        for key in keys { nested = nested[key] }
+        
+        let result = valDecoder(nested)
+        
+        switch result {
+        case .ok(_): return result
+        case .error(let error): return .error(":at(\(keys.joined(separator: "."))):\(error)")
+        }
+    }
+}
+
+public func optional<A>(_ decoder: @escaping Decoder<A>) -> Decoder<A?> {
+    return { json in
+        let result = decoder(json)
+        
+        switch result {
+        case .error(_): return .ok(nil)
+        case .ok(let value): return .ok(value)
+        }
+    }
+}
+
 public func optional<A, B>(_ key: String, _ valDecoder: @escaping Decoder<A>)
-    -> (_ decoder: @escaping Decoder<(A?) -> B>) -> Decoder<B> {
+    -> (@escaping Decoder<(A?) -> B>) -> Decoder<B> {
         let fieldDecoder = field(key, valDecoder)
         
-        return custom { json in
-            let result = fieldDecoder(json)
-            
-            switch result {
-            case .error: return .ok(nil)
-            case .ok(let value): return .ok(value)
-            }
-        }
+        return custom(optional(fieldDecoder))
 }
 
 public func hardcoded<A, B>(_ value: A)
@@ -120,7 +159,7 @@ public func hardcoded<A, B>(_ value: A)
         return custom(decode(value))
 }
 
-public func map<A, B>(_ f: @escaping (A) -> B) -> (_ decoder: @escaping Decoder<A>) -> Decoder<B> {
+public func map<A, B>(_ f: @escaping (A) -> B) -> (@escaping Decoder<A>) -> Decoder<B> {
     return { decoder in
         return { json in
             let result = decoder(json)
@@ -133,28 +172,15 @@ public func map<A, B>(_ f: @escaping (A) -> B) -> (_ decoder: @escaping Decoder<
     }
 }
 
-public func custom<A, B>(_ valDecoder: @escaping Decoder<A>)
-    -> (_ decoder: @escaping Decoder<(A) -> B>) -> Decoder<B> {
-        return { decoder in
-            return { json in
-                let result = decoder(json)
-                let valResult = valDecoder(json)
-                
-                switch result {
-                case .error(let error): return .error(error)
-                case .ok(let aToB):
-                    switch valResult {
-                    case .error(let error): return .error(error)
-                    case .ok(let a):
-                        return .ok(aToB(a))
-                    }
-                }
-            }
-        }
-}
-
 public func field<A>(_ key: String, _ decoder: @escaping Decoder<A>) -> Decoder<A> {
-    return { json in return decoder(json[key]) }
+    return { json in
+        let result = decoder(json[key])
+        
+        switch result {
+        case .ok(_): return result
+        case .error(let error): return .error(":field(\(key)):\(error)")
+        }
+    }
 }
 
 public func array<A>(_ decoder: @escaping Decoder<A>) -> Decoder<[A]> {
@@ -174,6 +200,40 @@ public func array<A>(_ decoder: @escaping Decoder<A>) -> Decoder<[A]> {
             return .ok(result)
         } else {
             return .error("Invalid array")
+        }
+    }
+}
+
+public func custom<A, B>(_ valDecoder: @escaping Decoder<A>)
+    -> (@escaping Decoder<(A) -> B>) -> Decoder<B> {
+        return { decoder in
+            return { json in
+                let result = decoder(json)
+                
+                switch result {
+                case .error(let error): return .error(error)
+                case .ok(let aToB):
+                    let valResult = valDecoder(json)
+                    
+                    switch valResult {
+                    case .error(let error): return .error(error)
+                    case .ok(let a):
+                        return .ok(aToB(a))
+                    }
+                }
+            }
+        }
+}
+
+public func andThen<A, B>(mapper: @escaping (A) -> Decoder<B>) -> (@escaping Decoder<A>) -> Decoder<B> {
+    return { decoder in
+        return { json in
+            let result = decoder(json)
+            
+            switch result {
+            case .ok(let value): return mapper(value)(json)
+            case .error(let error): return .error(error)
+            }
         }
     }
 }
@@ -209,4 +269,8 @@ public let double: Decoder<Double> = { json in
     } else {
         return .error("Invalid double")
     }
+}
+
+public let isPresent: Decoder<Bool> = { json in
+    return .ok(json.null == nil)
 }

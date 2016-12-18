@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'SwiftDecodePipeline'
-  s.version          = '0.0.1'
+  s.version          = '0.0.2'
   s.summary          = 'A library for building JSON decoders using the pipeline (|>) operator and plain function calls.'
 
 # This description is used to generate tags and improve search results.
