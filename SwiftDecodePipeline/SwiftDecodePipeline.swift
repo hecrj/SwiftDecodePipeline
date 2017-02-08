@@ -100,6 +100,14 @@ public func decode<A, B, C, D, E, F, G, H, I, J, K, L, M>(_ function: @escaping 
     return { json in return .ok(curry(function)) }
 }
 
+public func decode<A, B, C, D, E, F, G, H, I, J, K, L, M, N>(_ function: @escaping (A, B, C, D, E, F, G, H, I, J, K, L, M) -> N) -> Decoder<(A) -> (B) -> (C) -> (D) -> (E) -> (F) -> (G) -> (H) -> (I) -> (J) -> (K) -> (L) -> (M) -> N> {
+    return { json in return .ok(curry(function)) }
+}
+
+public func decode<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O>(_ function: @escaping (A, B, C, D, E, F, G, H, I, J, K, L, M, N) -> O) -> Decoder<(A) -> (B) -> (C) -> (D) -> (E) -> (F) -> (G) -> (H) -> (I) -> (J) -> (K) -> (L) -> (M) -> (N) -> O> {
+    return { json in return .ok(curry(function)) }
+}
+
 public func required<A>(_ decoder: @escaping Decoder<A?>) -> Decoder<A> {
     return { json in
         let result = decoder(json)
@@ -142,6 +150,17 @@ public func optional<A>(_ decoder: @escaping Decoder<A>) -> Decoder<A?> {
         
         switch result {
         case .error(_): return .ok(nil)
+        case .ok(let value): return .ok(value)
+        }
+    }
+}
+
+public func optional<A>(_ decoder: @escaping Decoder<A>, _ defaultValue: A) -> Decoder<A> {
+    return { json in
+        let result = decoder(json)
+        
+        switch result {
+        case .error(_): return .ok(defaultValue)
         case .ok(let value): return .ok(value)
         }
     }
