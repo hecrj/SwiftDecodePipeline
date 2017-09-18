@@ -27,7 +27,7 @@ reusable decoders.
 
 **SwiftDecodePipeline** tries to bring the spirit of [elm-decode-pipeline][edp] into Swift.
 
-## Example
+## Example
 
 Let's say that we have this type:
 
@@ -93,8 +93,8 @@ Thus, we end up using `array(decodeUser)` to transform our `Decoder<User>` into 
 when the format is invalid, or `.ok(Type)` when the input was decoded sucessfully.
 
 
-## Available functions
-### `decodeJSON(json, with: decoder)`
+## Available functions
+### `decodeJSON(json, with: decoder)`
 
 It allows to use decoders for JSON decoding in a convenient way. Right now, there are 3 different `decodeJSON` definitions. Each one of them accepts
 JSON in a different form: `Data`, `String` and `Any`.
@@ -112,7 +112,7 @@ let int:    Decoder<Int>
 let double: Decoder<Double>
 ```
 
-### Modifiers
+### Modifiers
 
 A modifier is a function that may take some configuration parameters and returns a function that can take a decoder and return a brand new decoder
 with some additional behaviour.
@@ -175,7 +175,7 @@ It transforms a decoded value from `A` to `B`.
 let decodeLowercasedString: Decoder<String> = string |> map { $0.lowercased }
 ```
 
-## Library support
+## Library support
 
 ### Alamofire
 
@@ -197,7 +197,7 @@ Alamofire.request("https://example.com/users").validate().responseJSON { respons
 }
 ```
 
-### SwiftyJSON
+### SwiftyJSON
 
 This library uses [SwiftyJSON](swiftyjson) internally. You should be able to decode `JSON` types using decoders
 directly:
@@ -224,7 +224,7 @@ Héctor Ramón Jiménez
 
 SwiftDecodePipeline is available under the MIT license. See the LICENSE file for more info.
 
-## Contributing
+## Contributing
 
 1. Fork the repository.
 2. Make your changes, tests will be appreciated.
